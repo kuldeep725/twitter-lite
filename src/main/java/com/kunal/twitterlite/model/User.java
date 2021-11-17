@@ -4,18 +4,18 @@ import java.util.UUID;
 
 public class User {
 
-    private UUID user_id;
+    private UUID userId;
     private String username;
     private String password;
 
     public User(UUID user_id, String username, String password) {
-        this.user_id = user_id;
+        this.userId = user_id;
         this.username = username;
         this.password = password;
     }
 
-    public UUID getUser_id() {
-        return user_id;
+    public UUID getUserId() {
+        return userId;
     }
 
     public String getUsername() {
@@ -29,7 +29,7 @@ public class User {
     @Override
     public String toString() {
         return "User{" +
-                "user_id=" + user_id +
+                "user_id=" + userId +
                 ", username='" + username + '\'' +
                 ", password='" + password + '\'' +
                 '}';
