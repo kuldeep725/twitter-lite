@@ -3,6 +3,7 @@ package com.kunal.twitterlite.repository;
 
 import com.kunal.twitterlite.exception.TwitterAuthException;
 import com.kunal.twitterlite.model.User;
+import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -30,11 +31,12 @@ public class UserRepositoryImpl implements UserRepository {
     @Override
     public UUID create(String username, String password) throws TwitterAuthException {
         try {
+            String hashedPassword = BCrypt.hashpw(password, BCrypt.gensalt(10));
             KeyHolder keyHolder = new GeneratedKeyHolder();
             jdbcTemplate.update(connection -> {
                 PreparedStatement ps = connection.prepareStatement(SQL_CREATE_USER, Statement.RETURN_GENERATED_KEYS);
                 ps.setString(1, username);
-                ps.setString(2, password);
+                ps.setString(2, hashedPassword);
                 return ps;
             }, keyHolder);
 
@@ -63,7 +65,7 @@ public class UserRepositoryImpl implements UserRepository {
     public User findByUsernameAndPassword(String username, String password) throws TwitterAuthException{
         try {
             User user = findByUsername(username);
-            if(!user.getPassword().equals(password))
+            if(!BCrypt.checkpw(password, user.getPassword()))
                 throw new TwitterAuthException("Invalid email/password");
 
             return user;
