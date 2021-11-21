@@ -14,11 +14,11 @@ public class TwitterLiteApplication {
     }
 
     @Bean
-    public FilterRegistrationBean<AuthFilter> filterFilterRegistrationBean() {
+    public FilterRegistrationBean<AuthFilter> filterRegistrationBean() {
         FilterRegistrationBean<AuthFilter> registrationBean = new FilterRegistrationBean<>();
         AuthFilter authFilter = new AuthFilter();
         registrationBean.setFilter(authFilter);
-        registrationBean.addUrlPatterns("/api/following/*");
+        registrationBean.addUrlPatterns("/api/following/*", "/api/admin/*", "/api/follower/*");
         return registrationBean;
     }
 

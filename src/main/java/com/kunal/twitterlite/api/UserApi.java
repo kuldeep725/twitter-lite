@@ -12,10 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @RestController
 @RequestMapping("/api/users")
@@ -31,9 +28,9 @@ public class UserApi {
 
         try {
             User user = userService.registerUser(username, password);
-            return new ResponseEntity<>(generateJWTToken(user), HttpStatus.OK);
+            return new ResponseEntity<>(generateJWTToken(user), HttpStatus.CREATED);
         } catch (TwitterAuthException e) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User registration failed");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User registration failed", e);
         }
     }
 
@@ -44,16 +41,6 @@ public class UserApi {
 
         User user = userService.validateUser(username, password);
         return new ResponseEntity<>(generateJWTToken(user), HttpStatus.OK);
-    }
-
-    // For ADMIN user
-    @GetMapping("/")
-    public List<User> getAllUsers() {
-        // TODO: check if the user is admin
-        if(!userService.isAdmin(new User(null, "admin", null)))
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User must be admin", new TwitterAuthException("User is not admin"));
-
-        return userService.getAllUsers();
     }
 
     private Map<String, String> generateJWTToken(User user) {
