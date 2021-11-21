@@ -13,7 +13,9 @@ import org.springframework.stereotype.Repository;
 
 import java.sql.PreparedStatement;
 import java.sql.Statement;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 @Repository
@@ -40,25 +42,26 @@ public class UserRepositoryImpl implements UserRepository {
                 return ps;
             }, keyHolder);
 
-            return (UUID) keyHolder.getKeys().get("user_id");
+            return (UUID) Objects.requireNonNull(keyHolder.getKeys()).get("user_id");
         } catch (Exception e) {
-            throw new TwitterAuthException("Invalid details. Failed to create account | " + e.getStackTrace());
+            throw new TwitterAuthException("Invalid details. Failed to create account | " + Arrays.toString(e.getStackTrace()));
         }
     }
 
     @Override
     public int getCountByUsername(String username) {
-        return jdbcTemplate.queryForObject(SQL_COUNT_BY_USERNAME, Integer.class, new Object[] {username});
+        Integer count = jdbcTemplate.queryForObject(SQL_COUNT_BY_USERNAME, Integer.class, username);
+        return (count != null ? count : 0);
     }
 
     @Override
     public User findById(UUID userId) {
-        return jdbcTemplate.queryForObject(SQL_FIND_USER_BY_ID, userRowMapper, new Object[] {userId});
+        return jdbcTemplate.queryForObject(SQL_FIND_USER_BY_ID, userRowMapper, userId);
     }
 
     @Override
     public User findByUsername(String username) {
-        return jdbcTemplate.queryForObject(SQL_FIND_USER_BY_USRENAME, userRowMapper, new Object[] {username});
+        return jdbcTemplate.queryForObject(SQL_FIND_USER_BY_USRENAME, userRowMapper, username);
     }
 
     @Override
@@ -70,7 +73,7 @@ public class UserRepositoryImpl implements UserRepository {
 
             return user;
         } catch (Exception e) {
-            throw new TwitterAuthException("Invalid email/password | " + e.getStackTrace());
+            throw new TwitterAuthException("Invalid email/password | " + Arrays.toString(e.getStackTrace()));
         }
     }
 
@@ -79,9 +82,9 @@ public class UserRepositoryImpl implements UserRepository {
         return jdbcTemplate.query(SQL_FIND_ALL_USERS, userRowMapper);
     }
 
-    private RowMapper<User> userRowMapper = ((rs, rowNum) -> {
-        return new User((UUID) UUID.fromString(rs.getString("user_id")),
-                rs.getString("username"),
-                rs.getString("password"));
-    });
+    private RowMapper<User> userRowMapper = ((rs, rowNum) -> new User(
+            UUID.fromString(rs.getString("user_id")),
+            rs.getString("username"),
+            rs.getString("password")
+        ));
 }

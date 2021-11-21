@@ -34,4 +34,8 @@ public class UserService {
     public User validateUser(String username, String password) {
         return repo.findByUsernameAndPassword(username, password);
     }
+
+    public User findUserById(UUID userId) {
+        return repo.findById(userId);
+    }
 }

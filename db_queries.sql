@@ -13,10 +13,10 @@ CREATE TABLE twitter_user(
 
 CREATE TABLE following(
     user_id UUID NOT NULL,
-    follower_id UUID NOT NULL,
-    PRIMARY KEY(user_id, follower_id),
+    following_id UUID NOT NULL,
+    PRIMARY KEY(user_id, following_id),
     CONSTRAINT fk_user_id FOREIGN KEY(user_id) REFERENCES twitter_user(user_id),
-    CONSTRAINT fk_follower_id FOREIGN KEY(follower_id) REFERENCES twitter_user(user_id)
+    CONSTRAINT fk_following_id FOREIGN KEY(following_id) REFERENCES twitter_user(user_id)
 );
 
 CREATE TABLE post(
