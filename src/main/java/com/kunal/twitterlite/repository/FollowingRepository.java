@@ -10,11 +10,13 @@ public interface FollowingRepository {
 
 //    int followUserByUsername(String username);
 
-    int followUserById(UUID userId, UUID followingId);
+    int followById(UUID userId, UUID followingId);
 
-    List<Map<String, String>> findAllFollowings(UUID userId);
+    List<UUID> findAllFollowings(UUID userId);
 
-    int unfollowUserById(UUID userId, UUID followingId);
+    int unfollowById(UUID userId, UUID followingId);
 
-    List<Map<String, String>> findAllFollowers(UUID userId);
+    List<UUID> findAllFollowers(UUID userId);
+
+    boolean isFollowing(UUID userId, UUID followingId);
 }

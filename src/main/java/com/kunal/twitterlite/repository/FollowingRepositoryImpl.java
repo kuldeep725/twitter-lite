@@ -2,6 +2,7 @@ package com.kunal.twitterlite.repository;
 
 import com.kunal.twitterlite.exception.TwitterAuthException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -14,38 +15,33 @@ import java.util.UUID;
 public class FollowingRepositoryImpl implements FollowingRepository {
 
     private static final String SQL_FOLLOW_USER_BY_ID = "INSERT INTO following(user_id, following_id) VALUES (?,?)";
-    private static final String SQL_UNFOLLOW_USER_BY_ID = "DELETE FROM following WHERE user_id=? and following_id=?";
-    private static final String SQL_FIND_ALL_FOLLOWINGS = "SELECT f.following_id followingId, t.username followingName\n" +
-            "FROM following f JOIN twitter_user t\n" +
-            "ON f.following_id = t.user_id\n" +
-            "WHERE f.user_id = ?";
-    private static final String SQL_FIND_ALL_FOLLOWERS = "SELECT f.user_id followerId, t.username followerName\n" +
-            "FROM following f\n" +
-            "JOIN twitter_user t ON f.user_id = t.user_id\n" +
-            "WHERE f.following_id = ?";
+    private static final String SQL_UNFOLLOW_USER_BY_ID = "DELETE FROM following WHERE user_id=? AND following_id=?";
+    private static final String SQL_FIND_ALL_FOLLOWINGS = "SELECT following_id FROM following WHERE user_id = ?";
+    private static final String SQL_FIND_ALL_FOLLOWERS = "SELECT user_id FROM following WHERE following_id = ?";
+    private static final String SQL_IS_FOLLOWING = "SELECT COUNT(*) FROM following WHERE user_id=? AND following_id=?";
 
     @Autowired
     JdbcTemplate jdbcTemplate;
 
+    /*
+        Returns: 0 if successful, -1 if failure in sql query
+     */
     @Override
-    public int followUserById(UUID userId, UUID followingId) {
+    public int followById(UUID userId, UUID followingId) {
         try {
             jdbcTemplate.update(SQL_FOLLOW_USER_BY_ID, userId, followingId);
             return 0;
         } catch (Exception e) {
-            throw new TwitterAuthException("Follow request failed | " + e);
+            e.printStackTrace();
+            return -1;
         }
     }
 
     @Override
-    public List<Map<String, String>> findAllFollowings(UUID userId) {
+    public List<UUID> findAllFollowings(UUID userId) {
         try {
-            List<Map<String, String>> output = jdbcTemplate.query(SQL_FIND_ALL_FOLLOWINGS, ((rs, rowNum) -> {
-                    Map<String, String> map = new HashMap<>();
-                    map.put("followingId", rs.getString("followingId"));
-                    map.put("followingName", rs.getString("followingName"));
-                    return map;
-                }),
+            List<UUID> output = jdbcTemplate.query(SQL_FIND_ALL_FOLLOWINGS,
+                ((rs, rowNum) -> UUID.fromString(rs.getString("following_id"))),
                 userId
             );
             return output;
@@ -55,30 +51,32 @@ public class FollowingRepositoryImpl implements FollowingRepository {
     }
 
     @Override
-    public int unfollowUserById(UUID userId, UUID followingId) {
+    public int unfollowById(UUID userId, UUID followingId) {
         try {
             jdbcTemplate.update(SQL_UNFOLLOW_USER_BY_ID, userId, followingId);
             return 0;
         } catch (Exception e) {
-            throw new TwitterAuthException("Unfollow request failed | " + e);
+            e.printStackTrace();
+            return -1;
         }
     }
 
     @Override
-    public List<Map<String, String>> findAllFollowers(UUID userId) {
+    public List<UUID> findAllFollowers(UUID userId) {
         try {
-            List<Map<String, String>> output = jdbcTemplate.query(SQL_FIND_ALL_FOLLOWERS, ((rs, rowNum) -> {
-                    Map<String, String> map = new HashMap<>();
-                    map.put("followerId", rs.getString("followerId"));
-                    map.put("followerName", rs.getString("followerName"));
-                    return map;
-                }),
+            List<UUID> output = jdbcTemplate.query(SQL_FIND_ALL_FOLLOWERS,
+                ((rs, rowNum) -> UUID.fromString(rs.getString("user_id"))),
                 userId
             );
             return output;
         } catch (Exception e) {
             throw new TwitterAuthException("Query failed | " + e);
         }
+    }
+
+    @Override
+    public boolean isFollowing(UUID userId, UUID followingId) {
+        return jdbcTemplate.queryForObject(SQL_IS_FOLLOWING, Integer.class, userId, followingId) != 0;
     }
 
 }
