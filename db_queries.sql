@@ -1,4 +1,3 @@
-
 DROP DATABASE IF EXISTS twitterdb;
 CREATE DATABASE twitterdb;
 \c twitterdb;
@@ -22,6 +21,7 @@ CREATE TABLE following(
 CREATE TABLE post(
     post_id UUID NOT NULL PRIMARY KEY DEFAULT uuid_generate_v4(),
     user_id UUID NOT NULL,
+    created_on TIMESTAMP WITH TIME ZONE NOT NULL,
     message VARCHAR (300) NOT NULL,
     CONSTRAINT fk_user_id FOREIGN KEY(user_id) REFERENCES twitter_user(user_id)
 );

@@ -18,7 +18,8 @@ public class TwitterLiteApplication {
         FilterRegistrationBean<AuthFilter> registrationBean = new FilterRegistrationBean<>();
         AuthFilter authFilter = new AuthFilter();
         registrationBean.setFilter(authFilter);
-        registrationBean.addUrlPatterns("/api/following/*", "/api/admin/*", "/api/follower/*");
+        final String[] URL_PATTERNS = new String[] {"/api/following/*", "/api/admin/*", "/api/follower/*", "/api/post/*" };
+        registrationBean.addUrlPatterns(URL_PATTERNS);
         return registrationBean;
     }
 
