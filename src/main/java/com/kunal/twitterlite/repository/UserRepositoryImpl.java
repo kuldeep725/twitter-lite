@@ -25,7 +25,7 @@ public class UserRepositoryImpl implements UserRepository {
     private static final String SQL_FIND_ALL_USERS = "SELECT user_id, username, password FROM twitter_user";
     private static final String SQL_FIND_USER_BY_ID = "SELECT user_id, username, password FROM twitter_user WHERE user_id=?";
     private static final String SQL_COUNT_BY_USERNAME = "SELECT COUNT(*) FROM twitter_user WHERE username=?";
-    private static final String SQL_FIND_USER_BY_USRENAME = "SELECT user_id, username, password FROM twitter_user WHERE username=?";
+    private static final String SQL_FIND_USER_BY_USERNAME = "SELECT user_id, username, password FROM twitter_user WHERE username=?";
 
     @Autowired
     JdbcTemplate jdbcTemplate;
@@ -61,7 +61,7 @@ public class UserRepositoryImpl implements UserRepository {
 
     @Override
     public User findByUsername(String username) {
-        return jdbcTemplate.queryForObject(SQL_FIND_USER_BY_USRENAME, userRowMapper, username);
+        return jdbcTemplate.queryForObject(SQL_FIND_USER_BY_USERNAME, userRowMapper, username);
     }
 
     @Override
@@ -82,7 +82,7 @@ public class UserRepositoryImpl implements UserRepository {
         return jdbcTemplate.query(SQL_FIND_ALL_USERS, userRowMapper);
     }
 
-    private RowMapper<User> userRowMapper = ((rs, rowNum) -> new User(
+    private final RowMapper<User> userRowMapper = ((rs, rowNum) -> new User(
             UUID.fromString(rs.getString("user_id")),
             rs.getString("username"),
             rs.getString("password")

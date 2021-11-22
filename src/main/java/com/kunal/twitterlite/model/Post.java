@@ -1,5 +1,7 @@
 package com.kunal.twitterlite.model;
 
+import org.springframework.lang.NonNull;
+
 import java.util.*;
 
 public class Post implements Comparable<Post>{
@@ -8,12 +10,18 @@ public class Post implements Comparable<Post>{
     private UUID userId;
     private String message;
     private Date createdOn;
+    private UUID repliedTo;
 
-    public Post(UUID postId, UUID userId, String message, Date createdOn) {
+    public Post(UUID postId, UUID userId, String message, Date createdOn, UUID repliedTo) {
         this.postId = postId;
         this.userId = userId;
         this.message = message;
         this.createdOn = createdOn;
+        this.repliedTo = repliedTo;
+    }
+
+    public UUID getRepliedTo() {
+        return repliedTo;
     }
 
     @Override
@@ -23,6 +31,7 @@ public class Post implements Comparable<Post>{
                 ", userId=" + userId +
                 ", message='" + message + '\'' +
                 ", createdOn=" + createdOn +
+                ", repliedTo=" + repliedTo +
                 '}';
     }
 
@@ -43,7 +52,7 @@ public class Post implements Comparable<Post>{
     }
 
     @Override
-    public int compareTo(Post o) {
+    public int compareTo(@NonNull Post o) {
         if(this.getCreatedOn() == null || o.getCreatedOn() == null)
             return 0;
         // sort in descending order of time of creation
@@ -54,13 +63,12 @@ public class Post implements Comparable<Post>{
         Map<String, String> map = new HashMap<>();
         // Using reflection api to automate the map generation of Post class
         Arrays.stream(Post.class.getDeclaredFields()).forEach(field -> {
-                try {
-                    map.put(field.getName(), field.get(this).toString());
-                } catch (IllegalAccessException e) {
-                    e.printStackTrace();
-                }
+            try {
+                map.put(field.getName(), Optional.ofNullable(field.get(this)).orElse("null").toString());
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
             }
-        );
+        });
         return map;
     }
 }

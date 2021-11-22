@@ -20,10 +20,11 @@ CREATE TABLE following(
 
 CREATE TABLE post(
     post_id UUID NOT NULL PRIMARY KEY DEFAULT uuid_generate_v4(),
-    user_id UUID NOT NULL,
+    posted_by UUID NOT NULL,
+    replied_to UUID,
     created_on TIMESTAMP WITH TIME ZONE NOT NULL,
     message VARCHAR (300) NOT NULL,
-    CONSTRAINT fk_user_id FOREIGN KEY(user_id) REFERENCES twitter_user(user_id)
+    CONSTRAINT fk_user_id FOREIGN KEY(post_by) REFERENCES twitter_user(user_id)
 );
 
 INSERT INTO twitter_user(username, password) VALUES('Williamson', '123');
