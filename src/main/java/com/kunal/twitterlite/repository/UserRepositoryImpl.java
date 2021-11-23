@@ -21,24 +21,25 @@ import java.util.UUID;
 @Repository
 public class UserRepositoryImpl implements UserRepository {
 
-    private static final String SQL_CREATE_USER = "INSERT INTO twitter_user(username, password) VALUES (?, ?)";
-    private static final String SQL_FIND_ALL_USERS = "SELECT user_id, username, password FROM twitter_user";
-    private static final String SQL_FIND_USER_BY_ID = "SELECT user_id, username, password FROM twitter_user WHERE user_id=?";
+    private static final String SQL_CREATE_USER = "INSERT INTO twitter_user(username, fullname, password) VALUES (?, ?, ?)";
+    private static final String SQL_FIND_ALL_USERS = "SELECT * FROM twitter_user";
+    private static final String SQL_FIND_USER_BY_ID = "SELECT * FROM twitter_user WHERE user_id=?";
     private static final String SQL_COUNT_BY_USERNAME = "SELECT COUNT(*) FROM twitter_user WHERE username=?";
-    private static final String SQL_FIND_USER_BY_USERNAME = "SELECT user_id, username, password FROM twitter_user WHERE username=?";
+    private static final String SQL_FIND_USER_BY_USERNAME = "SELECT * FROM twitter_user WHERE username=?";
 
     @Autowired
     JdbcTemplate jdbcTemplate;
 
     @Override
-    public UUID create(String username, String password) throws TwitterAuthException {
+    public UUID create(String username, String fullname, String password) throws TwitterAuthException {
         try {
             String hashedPassword = BCrypt.hashpw(password, BCrypt.gensalt(10));
             KeyHolder keyHolder = new GeneratedKeyHolder();
             jdbcTemplate.update(connection -> {
                 PreparedStatement ps = connection.prepareStatement(SQL_CREATE_USER, Statement.RETURN_GENERATED_KEYS);
                 ps.setString(1, username);
-                ps.setString(2, hashedPassword);
+                ps.setString(2, fullname);
+                ps.setString(3, hashedPassword);
                 return ps;
             }, keyHolder);
 
@@ -85,6 +86,7 @@ public class UserRepositoryImpl implements UserRepository {
     private final RowMapper<User> userRowMapper = ((rs, rowNum) -> new User(
             UUID.fromString(rs.getString("user_id")),
             rs.getString("username"),
+            rs.getString("fullname"),
             rs.getString("password")
         ));
 }

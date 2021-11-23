@@ -8,7 +8,7 @@ import java.util.UUID;
 
 public interface UserRepository {
 
-    UUID create(String username, String password) throws TwitterAuthException;
+    UUID create(String username, String fullname, String password) throws TwitterAuthException;
 
     int getCountByUsername(String username);
 

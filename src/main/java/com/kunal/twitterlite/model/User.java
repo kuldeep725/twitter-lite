@@ -1,37 +1,17 @@
 package com.kunal.twitterlite.model;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+
 import java.util.UUID;
 
+@Data
+@AllArgsConstructor
 public class User {
 
     private UUID userId;
     private String username;
+    private String fullname;
     private String password;
 
-    public User(UUID user_id, String username, String password) {
-        this.userId = user_id;
-        this.username = username;
-        this.password = password;
-    }
-
-    public UUID getUserId() {
-        return userId;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    @Override
-    public String toString() {
-        return "User{" +
-                "user_id=" + userId +
-                ", username='" + username + '\'' +
-                ", password='" + password + '\'' +
-                '}';
-    }
 }

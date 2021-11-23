@@ -24,10 +24,15 @@ public class UserApi {
     @PostMapping("/register")
     public ResponseEntity<Map<String, String>> register(@RequestBody Map<String, Object> userMap) {
         String username = (String) userMap.get("username");
+        String fullname = (String) userMap.get("fullname");
         String password = (String) userMap.get("password");
 
+        if(username == null || fullname == null || password == null)
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User registration failed", null);
+
+
         try {
-            User user = userService.registerUser(username, password);
+            User user = userService.registerUser(username, fullname, password);
             return new ResponseEntity<>(generateJWTToken(user), HttpStatus.CREATED);
         } catch (TwitterAuthException e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User registration failed", e);
@@ -38,6 +43,9 @@ public class UserApi {
     public ResponseEntity<Map<String, String>> login(@RequestBody Map<String, Object> userMap) {
         String username = (String) userMap.get("username");
         String password = (String) userMap.get("password");
+
+        if(username == null || password == null)
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User registration failed", null);
 
         User user = userService.validateUser(username, password);
         return new ResponseEntity<>(generateJWTToken(user), HttpStatus.OK);

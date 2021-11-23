@@ -15,11 +15,11 @@ public class UserService {
     @Autowired
     private UserRepository repo;
 
-    public User registerUser(String username, String password) {
+    public User registerUser(String username, String fullname, String password) {
         if(repo.getCountByUsername(username) != 0)
             throw new TwitterAuthException("Duplicate username");
 
-        UUID userId = repo.create(username, password);
+        UUID userId = repo.create(username, fullname, password);
         return repo.findById(userId);
     }
 

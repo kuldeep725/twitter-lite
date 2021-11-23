@@ -7,6 +7,7 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 CREATE TABLE twitter_user(
     user_id UUID NOT NULL PRIMARY KEY DEFAULT uuid_generate_v4(),
     username VARCHAR(100) NOT NULL,
+    fullname VARCHAR(200) NOT NULL,
     password VARCHAR(200) NOT NULL
 );
 
