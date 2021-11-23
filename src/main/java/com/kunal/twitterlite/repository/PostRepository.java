@@ -33,4 +33,6 @@ public interface PostRepository {
     int undoRetweetPost(UUID postId, UUID retweetedBy);
 
     List<Post> findComments(UUID repliedTo);
+
+    int editPost(UUID postId, String message);
 }

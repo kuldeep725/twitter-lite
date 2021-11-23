@@ -23,6 +23,7 @@ CREATE TABLE post(
     posted_by UUID NOT NULL,
     replied_to UUID,
     created_at TIMESTAMP WITH TIME ZONE NOT NULL,
+    last_modified_at TIMESTAMP WITH TIME ZONE NOT NULL,
     message VARCHAR (300) NOT NULL,
     CONSTRAINT fk_user_id FOREIGN KEY(posted_by) REFERENCES twitter_user(user_id)
 );

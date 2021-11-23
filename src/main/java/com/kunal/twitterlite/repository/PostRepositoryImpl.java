@@ -18,10 +18,11 @@ import java.util.UUID;
 public class PostRepositoryImpl implements PostRepository{
 
     private static final String SQL_CREATE_POST = "INSERT INTO post(posted_by, message, created_at) VALUES (?, ?, ?)";
+    private static final String SQL_EDIT_POST = "UPDATE post SET message = ?, last_modified_at = ? WHERE post_id = ?";
     private static final String SQL_FIND_POSTS_BY_USERID = "SELECT * FROM post WHERE posted_by = ? AND replied_to IS NULL";
     private static final String SQL_FIND_POST = "SELECT * FROM post WHERE post_id = ?";
-    private static final String SQL_LIKE_POST = "INSERT INTO likes(post_id, liked_by, liked_at) VALUES (?, ?)";
-    private static final String SQL_RETWEET_POST = "INSERT INTO retweet(post_id, retweeted_by, retweeted_at) VALUES (?, ?)";
+    private static final String SQL_LIKE_POST = "INSERT INTO likes(post_id, liked_by, liked_at) VALUES (?, ?, ?)";
+    private static final String SQL_RETWEET_POST = "INSERT INTO retweet(post_id, retweeted_by, retweeted_at) VALUES (?, ?, ?)";
     private static final String SQL_LIKED_BY = "SELECT * FROM likes WHERE post_id = ?";
     private static final String SQL_RETWEETED_BY = "SELECT * FROM retweet WHERE post_id = ?";
 
@@ -163,11 +164,24 @@ public class PostRepositoryImpl implements PostRepository{
         return jdbcTemplate.query(SQL_FIND_COMMENTS, postMapper, repliedTo);
     }
 
+    @Override
+    public int editPost(UUID postId, String message) {
+        try {
+            Date lastModifiedAt = Calendar.getInstance().getTime();
+            jdbcTemplate.update(SQL_EDIT_POST, message, lastModifiedAt, postId);
+            return 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return -1;
+        }
+    }
+
     private final RowMapper<Post> postMapper =  (rs, rowNum) -> new Post(
             UUID.fromString(rs.getString("post_id")),
             UUID.fromString(rs.getString("posted_by")),
             rs.getString("message"),
             rs.getTimestamp("created_at"),
+            rs.getTimestamp("last_modified_at"),
             (UUID) rs.getObject("replied_to") // this can be null
     );
 }

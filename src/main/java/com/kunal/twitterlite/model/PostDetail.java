@@ -13,6 +13,7 @@ public class PostDetail {
     private String username;
     private String message;
     private Date createdAt;
+    private Date lastModifiedAt;
     private UUID repliedTo;
 
     private int likes;

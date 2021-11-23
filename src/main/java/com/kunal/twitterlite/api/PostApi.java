@@ -47,6 +47,32 @@ public class PostApi {
                 .collect(Collectors.toList());
     }
 
+    @PutMapping("{postId}")
+    public ResponseEntity<Map<String, String>> editPost(@RequestAttribute UUID userId, @PathVariable UUID postId, @RequestBody Map<String, Object> postMap) {
+        String message = (String) postMap.get("message");
+        if(message == null)
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "message property is missing from request body", null);
+
+        if(message.length() >= 300)
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "message length can not be more than 300 characters", null);
+
+        int status = postService.editPost(postId, userId, message);
+
+        Map<String, String> map = new HashMap<>();
+
+        map.put("status", status == 0 ? "success" : "failure");
+
+        if(status == -1) {
+            map.put("reason", "Bad request: check postId");
+            return new ResponseEntity<>(map, HttpStatus.BAD_REQUEST);
+        }
+        if(status == -2) {
+            map.put("reason", "Post is not owned by you");
+            return new ResponseEntity<>(map, HttpStatus.NOT_ACCEPTABLE);
+        }
+        return new ResponseEntity<>(map, HttpStatus.ACCEPTED);
+    }
+
     @GetMapping("/personal")
     public List<PostDetail> getPersonalPosts(@RequestAttribute UUID userId) {
         List<Post> posts = postService.getPersonalPosts(userId);

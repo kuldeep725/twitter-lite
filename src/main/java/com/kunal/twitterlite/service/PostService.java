@@ -82,6 +82,7 @@ public class PostService {
         postDetail.setUsername(user.getUsername());
         postDetail.setMessage(post.getMessage());
         postDetail.setCreatedAt(post.getCreatedAt());
+        postDetail.setLastModifiedAt(post.getLastModifiedAt());
         postDetail.setRepliedTo(post.getRepliedTo());
 
         postDetail.setLikes(getLikes(postId).size());
@@ -126,5 +127,15 @@ public class PostService {
             return -1;
 
         return postRepository.createPost(userId, message, postId);
+    }
+
+    public int editPost(UUID postId, UUID userId, String message) {
+        Post post = postRepository.findPost(postId);
+        if(post == null)
+            return -1;
+        if(!post.getUserId().equals(userId))
+            return -2;
+
+        return postRepository.editPost(postId, message);
     }
 }
