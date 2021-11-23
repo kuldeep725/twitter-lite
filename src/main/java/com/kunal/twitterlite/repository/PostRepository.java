@@ -10,6 +10,8 @@ public interface PostRepository {
 
     int createPost(UUID userId, String message) throws TwitterAuthException;
 
+    int createPost(UUID postedBy, String message, UUID repliedTo) throws TwitterAuthException;
+
     List<Post> findPostsById(UUID userId);
 
     Post findPost(UUID postId);
@@ -28,4 +30,5 @@ public interface PostRepository {
 
     int undoRetweetPost(UUID postId, UUID retweetedBy);
 
+    List<Post> findComments(UUID repliedTo);
 }

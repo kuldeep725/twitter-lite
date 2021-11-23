@@ -59,6 +59,7 @@ public class Post implements Comparable<Post>{
         return o.getCreatedOn().compareTo(this.getCreatedOn());
     }
 
+    // Obsolete
     public Map<String, String> getPostMap() {
         Map<String, String> map = new HashMap<>();
         // Using reflection api to automate the map generation of Post class

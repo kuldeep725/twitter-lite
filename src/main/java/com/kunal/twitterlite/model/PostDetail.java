@@ -15,7 +15,8 @@ public class PostDetail {
     private Date createdOn;
     private UUID repliedTo;
 
-    private int likesCount;
-    private int retweetCount;
+    private int likes;
+    private int retweets;
+    private int comments;
 
 }

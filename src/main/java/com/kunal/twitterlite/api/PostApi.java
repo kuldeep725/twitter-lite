@@ -29,7 +29,7 @@ public class PostApi {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "message property is missing from request body", null);
 
         if(message.length() >= 300)
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "message length can not be more than 200 characters", null);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "message length can not be more than 300 characters", null);
 
         postService.createPost(userId, message);
         Map<String, String> map = new HashMap<>();
@@ -163,5 +163,30 @@ public class PostApi {
         }
         return new ResponseEntity<>(map, HttpStatus.ACCEPTED);
     }
+    @PostMapping("{postId}/comment")
+    public ResponseEntity<Map<String, String>> addComment(@RequestAttribute UUID userId, @PathVariable UUID postId, @RequestBody Map<String, Object> commentMap) {
+        String message = (String) commentMap.get("message");
+        if(message == null)
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "message property is missing from request body", null);
 
+        if(message.length() >= 300)
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "message length can not be more than 300 characters", null);
+
+        postService.addComment(postId, userId, message);
+        Map<String, String> map = new HashMap<>();
+        map.put("status", "success");
+        return new ResponseEntity<>(map, HttpStatus.CREATED);
+    }
+
+    @GetMapping("{postId}/comment")
+    public List<PostDetail> getComments(@RequestAttribute UUID userId, @PathVariable UUID postId) {
+        List<Post> posts = postService.getComments(postId);
+        Collections.sort(posts);
+        return posts.stream()
+                .map(post -> {
+                    User user = userService.findUserById(post.getUserId());
+                    return postService.getPostDetails(post, user);
+                })
+                .collect(Collectors.toList());
+    }
 }

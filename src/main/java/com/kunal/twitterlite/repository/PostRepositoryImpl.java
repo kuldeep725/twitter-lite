@@ -27,6 +27,8 @@ public class PostRepositoryImpl implements PostRepository{
     private static final String SQL_UNLIKE_POST = "DELETE FROM likes WHERE post_id = ? AND liked_by = ?";
     private static final String SQL_UNDO_RETWEET_POST = "DELETE FROM retweet WHERE post_id = ? AND retweeted_by = ?";
 
+    private static final String SQL_ADD_COMMENT = "INSERT INTO post(posted_by, message, created_on, replied_to) VALUES(?, ?, ?, ?)";
+    private static final String SQL_FIND_COMMENTS = "SELECT * FROM post WHERE replied_to = ?";
     @Autowired
     JdbcTemplate jdbcTemplate;
 
@@ -42,6 +44,17 @@ public class PostRepositoryImpl implements PostRepository{
     }
 
     @Override
+    public int createPost(UUID postedBy, String message, UUID repliedTo) throws TwitterAuthException{
+        try {
+            Date createdOn = Calendar.getInstance().getTime();
+            jdbcTemplate.update(SQL_ADD_COMMENT, postedBy, message, createdOn, repliedTo);
+            return 0;
+        } catch (Exception e) {
+            throw new TwitterAuthException("Comment failed failed | " + e);
+        }
+    }
+
+    @Override
     public List<Post> findPostsById(UUID postedBy) {
         return jdbcTemplate.query(SQL_FIND_POSTS_BY_USERID, postMapper,
             postedBy
@@ -50,7 +63,12 @@ public class PostRepositoryImpl implements PostRepository{
 
     @Override
     public Post findPost(UUID postId) {
-        return jdbcTemplate.queryForObject(SQL_FIND_POST, postMapper, postId);
+        try {
+            return jdbcTemplate.queryForObject(SQL_FIND_POST, postMapper, postId);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     @Override
@@ -122,6 +140,11 @@ public class PostRepositoryImpl implements PostRepository{
             e.printStackTrace();
             return -1;
         }
+    }
+
+    @Override
+    public List<Post> findComments(UUID repliedTo) {
+        return jdbcTemplate.query(SQL_FIND_COMMENTS, postMapper, repliedTo);
     }
 
     private final RowMapper<Post> postMapper =  (rs, rowNum) -> new Post(

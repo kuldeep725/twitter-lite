@@ -51,12 +51,16 @@ public class PostService {
         return postRepository.retweetPost(postId, retweetedBy);
     }
 
-    public int getLikesCount(UUID postId) {
-        return postRepository.findPostLikes(postId).size();
+    public List<UUID> getLikes(UUID postId) {
+        return postRepository.findPostLikes(postId);
     }
 
-    public int getRetweetCount(UUID postId) {
-        return postRepository.findPostRetweets(postId).size();
+    public List<UUID> getRetweets(UUID postId) {
+        return postRepository.findPostRetweets(postId);
+    }
+
+    public List<Post> getComments(UUID postId) {
+        return postRepository.findComments(postId);
     }
 
     public PostDetail getPostDetails(Post post, User user) {
@@ -70,14 +74,18 @@ public class PostService {
         postDetail.setMessage(post.getMessage());
         postDetail.setCreatedOn(post.getCreatedOn());
         postDetail.setRepliedTo(post.getRepliedTo());
-        postDetail.setLikesCount(getLikesCount(postId));
-        postDetail.setRetweetCount(getRetweetCount(postId));
+
+        postDetail.setLikes(getLikes(postId).size());
+        postDetail.setRetweets(getRetweets(postId).size());
+        postDetail.setComments(getComments(postId).size());
 
         return postDetail;
     }
 
     public int deletePost(UUID postId, UUID userId) {
         Post post = postRepository.findPost(postId);
+        if(post == null)
+            return -1;
         if(!post.getUserId().equals(userId))
             return -2;
 
@@ -98,4 +106,10 @@ public class PostService {
         return postRepository.undoRetweetPost(postId, userId);
     }
 
+    public int addComment(UUID postId, UUID userId, String message) {
+        if(postRepository.findPost(postId) == null)
+            return -1;
+
+        return postRepository.createPost(userId, message, postId);
+    }
 }
