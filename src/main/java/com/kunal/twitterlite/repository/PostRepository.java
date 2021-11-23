@@ -10,6 +10,22 @@ public interface PostRepository {
 
     int createPost(UUID userId, String message) throws TwitterAuthException;
 
-    List<Post> getPostsByUserId(UUID userId);
+    List<Post> findPostsById(UUID userId);
+
+    Post findPost(UUID postId);
+
+    int likePost(UUID postId, UUID likedBy);
+
+    int retweetPost(UUID postId, UUID retweetedBy);
+
+    List<UUID> findPostLikes(UUID postId);
+
+    List<UUID> findPostRetweets(UUID postId);
+
+    int deletePost(UUID postId);
+
+    int unlikePost(UUID postId, UUID likedBy);
+
+    int undoRetweetPost(UUID postId, UUID retweetedBy);
 
 }
