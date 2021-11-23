@@ -12,7 +12,7 @@ public class PostDetail {
     private UUID userId;
     private String username;
     private String message;
-    private Date createdOn;
+    private Date createdAt;
     private UUID repliedTo;
 
     private int likes;

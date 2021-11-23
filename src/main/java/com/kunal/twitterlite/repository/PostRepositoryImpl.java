@@ -1,7 +1,9 @@
 package com.kunal.twitterlite.repository;
 
 import com.kunal.twitterlite.exception.TwitterAuthException;
+import com.kunal.twitterlite.model.LikeDetail;
 import com.kunal.twitterlite.model.Post;
+import com.kunal.twitterlite.model.RetweetDetail;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -15,19 +17,19 @@ import java.util.UUID;
 @Repository
 public class PostRepositoryImpl implements PostRepository{
 
-    private static final String SQL_CREATE_POST = "INSERT INTO post(posted_by, message, created_on) VALUES (?, ?, ?)";
+    private static final String SQL_CREATE_POST = "INSERT INTO post(posted_by, message, created_at) VALUES (?, ?, ?)";
     private static final String SQL_FIND_POSTS_BY_USERID = "SELECT * FROM post WHERE posted_by = ? AND replied_to IS NULL";
     private static final String SQL_FIND_POST = "SELECT * FROM post WHERE post_id = ?";
-    private static final String SQL_LIKE_POST = "INSERT INTO likes(post_id, liked_by) VALUES (?, ?)";
-    private static final String SQL_RETWEET_POST = "INSERT INTO retweet(post_id, retweeted_by) VALUES (?, ?)";
-    private static final String SQL_LIKED_BY = "SELECT liked_by FROM likes WHERE post_id = ?";
-    private static final String SQL_RETWEETED_BY = "SELECT retweeted_by FROM retweet WHERE post_id = ?";
+    private static final String SQL_LIKE_POST = "INSERT INTO likes(post_id, liked_by, liked_at) VALUES (?, ?)";
+    private static final String SQL_RETWEET_POST = "INSERT INTO retweet(post_id, retweeted_by, retweeted_at) VALUES (?, ?)";
+    private static final String SQL_LIKED_BY = "SELECT * FROM likes WHERE post_id = ?";
+    private static final String SQL_RETWEETED_BY = "SELECT * FROM retweet WHERE post_id = ?";
 
     private static final String SQL_DELETE_POST = "DELETE FROM post WHERE post_id = ?";
     private static final String SQL_UNLIKE_POST = "DELETE FROM likes WHERE post_id = ? AND liked_by = ?";
     private static final String SQL_UNDO_RETWEET_POST = "DELETE FROM retweet WHERE post_id = ? AND retweeted_by = ?";
 
-    private static final String SQL_ADD_COMMENT = "INSERT INTO post(posted_by, message, created_on, replied_to) VALUES(?, ?, ?, ?)";
+    private static final String SQL_ADD_COMMENT = "INSERT INTO post(posted_by, message, created_at, replied_to) VALUES(?, ?, ?, ?)";
     private static final String SQL_FIND_COMMENTS = "SELECT * FROM post WHERE replied_to = ?";
     @Autowired
     JdbcTemplate jdbcTemplate;
@@ -35,8 +37,8 @@ public class PostRepositoryImpl implements PostRepository{
     @Override
     public int createPost(UUID postedBy, String message) throws TwitterAuthException{
         try {
-            Date createdOn = Calendar.getInstance().getTime();
-            jdbcTemplate.update(SQL_CREATE_POST, postedBy, message, createdOn);
+            Date createdAt = Calendar.getInstance().getTime();
+            jdbcTemplate.update(SQL_CREATE_POST, postedBy, message, createdAt);
             return 0;
         } catch (Exception e) {
             throw new TwitterAuthException("Post creation failed | " + e);
@@ -46,8 +48,8 @@ public class PostRepositoryImpl implements PostRepository{
     @Override
     public int createPost(UUID postedBy, String message, UUID repliedTo) throws TwitterAuthException{
         try {
-            Date createdOn = Calendar.getInstance().getTime();
-            jdbcTemplate.update(SQL_ADD_COMMENT, postedBy, message, createdOn, repliedTo);
+            Date createdAt = Calendar.getInstance().getTime();
+            jdbcTemplate.update(SQL_ADD_COMMENT, postedBy, message, createdAt, repliedTo);
             return 0;
         } catch (Exception e) {
             throw new TwitterAuthException("Comment failed failed | " + e);
@@ -74,7 +76,8 @@ public class PostRepositoryImpl implements PostRepository{
     @Override
     public int likePost(UUID postId, UUID likedBy) {
         try {
-            jdbcTemplate.update(SQL_LIKE_POST, postId, likedBy);
+            Date likedAt = Calendar.getInstance().getTime();
+            jdbcTemplate.update(SQL_LIKE_POST, postId, likedBy, likedAt);
             return 0;
         } catch (Exception e) {
             e.printStackTrace();
@@ -85,7 +88,8 @@ public class PostRepositoryImpl implements PostRepository{
     @Override
     public int retweetPost(UUID postId, UUID retweetedBy) {
         try {
-            jdbcTemplate.update(SQL_RETWEET_POST, postId, retweetedBy);
+            Date retweetedAt = Calendar.getInstance().getTime();
+            jdbcTemplate.update(SQL_RETWEET_POST, postId, retweetedBy, retweetedAt);
             return 0;
         } catch (Exception e) {
             e.printStackTrace();
@@ -94,17 +98,29 @@ public class PostRepositoryImpl implements PostRepository{
     }
 
     @Override
-    public List<UUID> findPostLikes(UUID postId) {
+    public List<LikeDetail> findPostLikes(UUID postId) {
         return jdbcTemplate.query(SQL_LIKED_BY,
-            (rs, rowNum) -> UUID.fromString(rs.getString("liked_by")),
+            (rs, rowNum) -> {
+                LikeDetail likeDetail = new LikeDetail();
+                likeDetail.setPostId(UUID.fromString(rs.getString("post_id")));
+                likeDetail.setLikedBy(UUID.fromString(rs.getString("liked_by")));
+                likeDetail.setLikedAt(rs.getTimestamp("liked_at"));
+                return likeDetail;
+            },
             postId
         );
     }
 
     @Override
-    public List<UUID> findPostRetweets(UUID postId) {
+    public List<RetweetDetail> findPostRetweets(UUID postId) {
         return jdbcTemplate.query(SQL_RETWEETED_BY,
-            (rs, rowNum) -> UUID.fromString(rs.getString("retweeted_by")),
+            (rs, rowNum) -> {
+                RetweetDetail retweetDetail = new RetweetDetail();
+                retweetDetail.setPostId(UUID.fromString(rs.getString("post_id")));
+                retweetDetail.setRetweetedBy(UUID.fromString(rs.getString("retweeted_by")));
+                retweetDetail.setRetweetAt(rs.getTimestamp("retweeted_at"));
+                return retweetDetail;
+            },
             postId
         );
     }
@@ -151,7 +167,7 @@ public class PostRepositoryImpl implements PostRepository{
             UUID.fromString(rs.getString("post_id")),
             UUID.fromString(rs.getString("posted_by")),
             rs.getString("message"),
-            rs.getTimestamp("created_on"),
+            rs.getTimestamp("created_at"),
             (UUID) rs.getObject("replied_to") // this can be null
     );
 }

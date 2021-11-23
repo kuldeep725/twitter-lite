@@ -9,14 +9,14 @@ public class Post implements Comparable<Post>{
     private UUID postId;
     private UUID userId;
     private String message;
-    private Date createdOn;
+    private Date createdAt;
     private UUID repliedTo;
 
-    public Post(UUID postId, UUID userId, String message, Date createdOn, UUID repliedTo) {
+    public Post(UUID postId, UUID userId, String message, Date createdAt, UUID repliedTo) {
         this.postId = postId;
         this.userId = userId;
         this.message = message;
-        this.createdOn = createdOn;
+        this.createdAt = createdAt;
         this.repliedTo = repliedTo;
     }
 
@@ -30,13 +30,13 @@ public class Post implements Comparable<Post>{
                 "postId=" + postId +
                 ", userId=" + userId +
                 ", message='" + message + '\'' +
-                ", createdOn=" + createdOn +
+                ", createdAt=" + createdAt +
                 ", repliedTo=" + repliedTo +
                 '}';
     }
 
-    public Date getCreatedOn() {
-        return createdOn;
+    public Date getCreatedAt() {
+        return createdAt;
     }
 
     public UUID getPostId() {
@@ -52,11 +52,11 @@ public class Post implements Comparable<Post>{
     }
 
     @Override
-    public int compareTo(@NonNull Post o) {
-        if(this.getCreatedOn() == null || o.getCreatedOn() == null)
+    public int compareTo(@NonNull Post other) {
+        if(this.getCreatedAt() == null || other.getCreatedAt() == null)
             return 0;
         // sort in descending order of time of creation
-        return o.getCreatedOn().compareTo(this.getCreatedOn());
+        return other.getCreatedAt().compareTo(this.getCreatedAt());
     }
 
     // Obsolete

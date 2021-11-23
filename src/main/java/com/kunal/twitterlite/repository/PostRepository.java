@@ -1,7 +1,9 @@
 package com.kunal.twitterlite.repository;
 
 import com.kunal.twitterlite.exception.TwitterAuthException;
+import com.kunal.twitterlite.model.LikeDetail;
 import com.kunal.twitterlite.model.Post;
+import com.kunal.twitterlite.model.RetweetDetail;
 
 import java.util.List;
 import java.util.UUID;
@@ -20,9 +22,9 @@ public interface PostRepository {
 
     int retweetPost(UUID postId, UUID retweetedBy);
 
-    List<UUID> findPostLikes(UUID postId);
+    List<LikeDetail> findPostLikes(UUID postId);
 
-    List<UUID> findPostRetweets(UUID postId);
+    List<RetweetDetail> findPostRetweets(UUID postId);
 
     int deletePost(UUID postId);
 

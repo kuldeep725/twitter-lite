@@ -22,7 +22,7 @@ CREATE TABLE post(
     post_id UUID NOT NULL PRIMARY KEY DEFAULT uuid_generate_v4(),
     posted_by UUID NOT NULL,
     replied_to UUID,
-    created_on TIMESTAMP WITH TIME ZONE NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL,
     message VARCHAR (300) NOT NULL,
     CONSTRAINT fk_user_id FOREIGN KEY(posted_by) REFERENCES twitter_user(user_id)
 );
@@ -31,6 +31,7 @@ CREATE TABLE post(
 CREATE TABLE likes(
     post_id UUID NOT NULL,
     liked_by UUID NOT NULL,
+    liked_at TIMESTAMP WITH TIME ZONE,
     PRIMARY KEY(post_id, liked_by),
     CONSTRAINT fk_post_id FOREIGN KEY(post_id) REFERENCES post(post_id),
     CONSTRAINT fk_user_id FOREIGN KEY(liked_by) REFERENCES twitter_user(user_id)
@@ -39,6 +40,7 @@ CREATE TABLE likes(
 CREATE TABLE retweet(
      post_id UUID NOT NULL,
      retweeted_by UUID NOT NULL,
+     retweeted_at TIMESTAMP WITH TIME ZONE,
      PRIMARY KEY(post_id, retweeted_by),
      CONSTRAINT fk_post_id FOREIGN KEY(post_id) REFERENCES post(post_id),
      CONSTRAINT fk_user_id FOREIGN KEY(retweeted_by) REFERENCES twitter_user(user_id)

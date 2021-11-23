@@ -1,8 +1,6 @@
 package com.kunal.twitterlite.api;
 
-import com.kunal.twitterlite.model.Post;
-import com.kunal.twitterlite.model.PostDetail;
-import com.kunal.twitterlite.model.User;
+import com.kunal.twitterlite.model.*;
 import com.kunal.twitterlite.service.PostService;
 import com.kunal.twitterlite.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -89,6 +87,11 @@ public class PostApi {
         return new ResponseEntity<>(map, HttpStatus.ACCEPTED);
     }
 
+    @GetMapping("{postId}/like")
+    public List<LikeDetail> getLikes(@PathVariable UUID postId) {
+        return postService.getLikes(postId);
+    }
+
     @PostMapping("/{postId}/retweet")
     public ResponseEntity<Map<String, String>> retweetPost(@RequestAttribute UUID userId, @PathVariable UUID postId) {
         int status = postService.retweetPost(postId, userId);
@@ -105,6 +108,11 @@ public class PostApi {
             return new ResponseEntity<>(map, HttpStatus.NOT_ACCEPTABLE);
         }
         return new ResponseEntity<>(map, HttpStatus.ACCEPTED);
+    }
+
+    @GetMapping("{postId}/retweet")
+    public List<RetweetDetail> getRetweets(@PathVariable UUID postId) {
+        return postService.getRetweets(postId);
     }
 
     @DeleteMapping("{postId}")
