@@ -17,7 +17,7 @@ import java.util.UUID;
 @Repository
 public class PostRepositoryImpl implements PostRepository{
 
-    private static final String SQL_CREATE_POST = "INSERT INTO post(posted_by, message, created_at) VALUES (?, ?, ?)";
+    private static final String SQL_CREATE_POST = "INSERT INTO post(posted_by, message, created_at, last_modified_at) VALUES (?, ?, ?, ?)";
     private static final String SQL_EDIT_POST = "UPDATE post SET message = ?, last_modified_at = ? WHERE post_id = ?";
     private static final String SQL_FIND_POSTS_BY_USERID = "SELECT * FROM post WHERE posted_by = ? AND replied_to IS NULL";
     private static final String SQL_FIND_POST = "SELECT * FROM post WHERE post_id = ?";
@@ -39,7 +39,7 @@ public class PostRepositoryImpl implements PostRepository{
     public int createPost(UUID postedBy, String message) throws TwitterAuthException{
         try {
             Date createdAt = Calendar.getInstance().getTime();
-            jdbcTemplate.update(SQL_CREATE_POST, postedBy, message, createdAt);
+            jdbcTemplate.update(SQL_CREATE_POST, postedBy, message, createdAt, createdAt);
             return 0;
         } catch (Exception e) {
             throw new TwitterAuthException("Post creation failed | " + e);
