@@ -8,7 +8,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 @Configuration
-public class MainConfig {
+public class DbConfigation {
 
     @Bean
     public BasicDataSource dataSource() throws URISyntaxException {
