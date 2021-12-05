@@ -22,7 +22,7 @@ public class UserApi {
     private UserService userService;
 
     @PostMapping("/register")
-    public ResponseEntity<Map<String, String>> register(@RequestBody Map<String, Object> userMap) {
+    public ResponseEntity<Map<String, Object>> register(@RequestBody Map<String, Object> userMap) {
         String username = (String) userMap.get("username");
         String fullname = (String) userMap.get("fullname");
         String password = (String) userMap.get("password");
@@ -40,7 +40,7 @@ public class UserApi {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<Map<String, String>> login(@RequestBody Map<String, Object> userMap) {
+    public ResponseEntity<Map<String, Object>> login(@RequestBody Map<String, Object> userMap) {
         String username = (String) userMap.get("username");
         String password = (String) userMap.get("password");
 
@@ -51,7 +51,7 @@ public class UserApi {
         return new ResponseEntity<>(generateJWTToken(user), HttpStatus.OK);
     }
 
-    private Map<String, String> generateJWTToken(User user) {
+    private Map<String, Object> generateJWTToken(User user) {
         long timestamp = System.currentTimeMillis();
         String token = Jwts.builder().signWith(SignatureAlgorithm.HS256, Constant.SECRET_API_KEY)
                 .setIssuedAt(new Date(timestamp))
@@ -60,8 +60,15 @@ public class UserApi {
                 .claim("username", user.getUsername())
                 .compact();
 
-        Map<String, String> map = new HashMap<>();
+        Map<String, Object> userMap = new HashMap<>();
+        userMap.put("username", user.getUsername());
+        userMap.put("userId", user.getUserId());
+        userMap.put("fullname", user.getFullname());
+
+        Map<String, Object> map = new HashMap<>();
         map.put("token", token);
+        map.put("user", userMap);
+
         return map;
     }
 
