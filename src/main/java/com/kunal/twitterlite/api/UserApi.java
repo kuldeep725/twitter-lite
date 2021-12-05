@@ -47,7 +47,12 @@ public class UserApi {
         if(username == null || password == null)
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User registration failed", null);
 
-        User user = userService.validateUser(username, password);
+        User user;
+        try {
+            user = userService.validateUser(username, password);
+        } catch (TwitterAuthException e) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, e.getMessage(), null);
+        }
         return new ResponseEntity<>(generateJWTToken(user), HttpStatus.OK);
     }
 
