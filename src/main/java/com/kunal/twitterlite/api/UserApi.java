@@ -9,6 +9,7 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -16,6 +17,7 @@ import java.util.*;
 
 @RestController
 @RequestMapping("/api/users")
+//@CrossOrigin(origins = { "http://localhost:3000/", "https://twitter-lite-frontend.herokuapp.com"})
 public class UserApi {
 
     @Autowired
@@ -44,7 +46,7 @@ public class UserApi {
         String username = (String) userMap.get("username");
         String password = (String) userMap.get("password");
 
-        if(username == null || password == null)
+        if(!StringUtils.hasLength(username) || !StringUtils.hasLength(password))
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User registration failed", null);
 
         User user;

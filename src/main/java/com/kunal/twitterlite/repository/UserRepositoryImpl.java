@@ -45,7 +45,8 @@ public class UserRepositoryImpl implements UserRepository {
 
             return (UUID) Objects.requireNonNull(keyHolder.getKeys()).get("user_id");
         } catch (Exception e) {
-            throw new TwitterAuthException("Invalid details. Failed to create account | " + Arrays.toString(e.getStackTrace()));
+            e.printStackTrace();
+            throw new TwitterAuthException("Invalid details. Failed to create account");
         }
     }
 
@@ -74,7 +75,8 @@ public class UserRepositoryImpl implements UserRepository {
 
             return user;
         } catch (Exception e) {
-            throw new TwitterAuthException("Invalid email/password | " + Arrays.toString(e.getStackTrace()));
+            e.printStackTrace();
+            throw new TwitterAuthException("Invalid email/password");
         }
     }
 
