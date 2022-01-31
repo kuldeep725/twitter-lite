@@ -1,6 +1,6 @@
 # Twitter-lite
 
-This is a web application similar to Twitter.
+This is a web application similar to Twitter.<br>
 User can sign up, follow their favourite celebrities, post their own views, browse through posts of the connections.
 
 ## Technology 
